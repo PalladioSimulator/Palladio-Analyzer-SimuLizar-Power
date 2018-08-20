@@ -225,18 +225,4 @@ litigation.
          version="0.0.0"
          unpack="false"/>
 
-   <plugin
-         id="org.palladiosimulator.simulizar.slidingwindow"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.palladiosimulator.simulizar.utilization"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
 </feature>
