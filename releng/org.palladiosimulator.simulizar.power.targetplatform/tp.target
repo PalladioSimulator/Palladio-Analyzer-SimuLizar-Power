@@ -163,7 +163,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="LIMBO_DLIM.feature.group" version="0.16.1.201606230914"/>
-<repository location="https://se4.informatik.uni-wuerzburg.de/nexus/content/unzip/public-unzip/tools/descartes/dlim/tools.descartes.dlim.releng.p2/0.16.1-SNAPSHOT/tools.descartes.dlim.releng.p2-0.16.1-SNAPSHOT.zip-unzip/"/>
+<repository location="https://se2.informatik.uni-wuerzburg.de/eclipse/limbo/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit" filter="release" refresh="true">
 <unit id="org.palladiosimulator.simulizar.feature.feature.group" version="2.1.0.201711211534-8h_SEFbcPueBA312721262539"/>
