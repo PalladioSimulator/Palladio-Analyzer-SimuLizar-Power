@@ -1,4 +1,3 @@
-palladioBuild {
-	webserverDir = 'simulizarpower'
-	updateSiteLocation = 'releng/org.palladiosimulator.simulizar.power.updatesite/target/repository'
+PalladioPipeline {
+    deployUpdatesite 'releng/org.palladiosimulator.simulizar.power.updatesite/target/repository'
 }
