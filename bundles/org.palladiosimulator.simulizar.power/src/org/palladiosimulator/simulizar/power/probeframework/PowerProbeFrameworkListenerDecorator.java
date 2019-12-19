@@ -28,6 +28,7 @@ import org.palladiosimulator.monitorrepository.TimeDriven;
 import org.palladiosimulator.monitorrepository.TimeDrivenAggregation;
 import org.palladiosimulator.monitorrepository.util.MonitorRepositorySwitch;
 import org.palladiosimulator.runtimemeasurement.RuntimeMeasurementModel;
+import org.palladiosimulator.runtimemeasurement.RuntimeMeasurementPackage;
 import org.palladiosimulator.simulizar.interpreter.listener.AbstractProbeFrameworkListener;
 import org.palladiosimulator.simulizar.interpreter.listener.AbstractRecordingProbeFrameworkListenerDecorator;
 import org.palladiosimulator.simulizar.power.calculators.SimulationTimeEnergyCalculator;
@@ -93,8 +94,9 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
     public void setProbeFrameworkListener(final AbstractProbeFrameworkListener probeFrameworkListener) {
         super.setProbeFrameworkListener(probeFrameworkListener);
         this.model = getProbeFrameworkListener().getSimuComModel();
-        this.rmModel = getProbeFrameworkListener().getRuntimeMeasurementModel();
-        this.globalPCMModelResourceSet = getProbeFrameworkListener().getModelAccess().getGlobalPCMModel()
+        this.rmModel = getProbeFrameworkListener().getPCMPartitionManager() 
+				.findModel(RuntimeMeasurementPackage.eINSTANCE.getRuntimeMeasurementModel());
+        this.globalPCMModelResourceSet = getProbeFrameworkListener().getPCMPartitionManager().getGlobalPCMModel()
                 .getResourceSet();
     }
 
