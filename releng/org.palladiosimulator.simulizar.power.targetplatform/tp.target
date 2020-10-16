@@ -161,9 +161,9 @@
 <unit id="org.palladiosimulator.experimentanalysis.feature.feature.group" version="1.0.0.201712111519"/>
 <repository location="https://updatesite.palladio-simulator.com/palladio-qual-experimentanalysis/nightly/"/>
 </location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit" refresh="true">
 <unit id="LIMBO_DLIM.feature.group" version="0.16.1.201606230914"/>
-<repository location="http://se2.informatik.uni-wuerzburg.de/eclipse/limbo/"/>
+<repository location="https://updatesite.palladio-simulator.com/palladio-p2mirror-dlim/nightly/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit" filter="release" refresh="true">
 <unit id="org.palladiosimulator.simulizar.feature.feature.group" version="2.1.0.201711211534-8h_SEFbcPueBA312721262539"/>
