@@ -2,7 +2,7 @@
 <feature
       id="org.palladiosimulator.simulizar.power.feature"
       label="SimuLizar Power Consumption Analysis Extension"
-      version="5.0.0.qualifier">
+      version="5.1.0.qualifier">
 
    <description url="https://sdqweb.ipd.kit.edu/wiki/Power_Consumption_Analyzer">
       Allows to self-adaptations based on predicted power and energy
