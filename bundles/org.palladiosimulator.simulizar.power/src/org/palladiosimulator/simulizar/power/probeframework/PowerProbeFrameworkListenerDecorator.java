@@ -45,8 +45,9 @@ import de.fzi.power.interpreter.PowerModelUpdaterSwitch;
 import de.fzi.power.interpreter.calculators.ExtensibleCalculatorInstantiatorImpl;
 import de.fzi.power.interpreter.calculators.ITimeProvider;
 import de.fzi.power.interpreter.calculators.energy.SimpsonRuleCumulativeEnergyCalculator;
-import de.uka.ipd.sdq.simucomframework.model.SimuComModel;
-import de.uka.ipd.sdq.simulation.ISimulationListener;
+import de.fzi.power.interpreter.util.IExtensionHelper;
+import de.uka.ipd.sdq.simucomframework.core.model.SimuComModel;
+import de.uka.ipd.sdq.simulation.core.ISimulationListener;
 
 /**
  * Implementation of the {@link AbstractRecordingProbeFrameworkListenerDecorator} class dedicated to
@@ -62,7 +63,7 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
     private static final BaseMetricDescription POWER_CONSUMPTION_METRIC_DESC = MetricDescriptionConstants.POWER_CONSUMPTION;
     private static final MetricSetDescription ENERGY_CONSUMPTION_TUPLE_METRIC_DESC = MetricDescriptionConstants.CUMULATIVE_ENERGY_CONSUMPTION_TUPLE;
 
-    private static final MonitorRepositorySwitch<Optional<TimeDriven>> PROCESSING_TYPE_SWITCH = new MonitorRepositorySwitch<Optional<TimeDriven>>() {
+    private static final MonitorRepositorySwitch<Optional<TimeDriven>> PROCESSING_TYPE_SWITCH = new MonitorRepositorySwitch<>() {
         @Override
         public Optional<TimeDriven> caseTimeDriven(final TimeDriven timeDriven) {
             return Optional.of(timeDriven);
@@ -83,10 +84,10 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
         super.registerMeasurements();
 
         Collection<MeasurementSpecification> powerMeasurementSpecs = new ArrayList<>(getProbeFrameworkListener()
-                .getMeasurementSpecificationsForMetricDescription(POWER_CONSUMPTION_METRIC_DESC));
+            .getMeasurementSpecificationsForMetricDescription(POWER_CONSUMPTION_METRIC_DESC));
         // also consider case when power metric tuple rather than power metric is chosen
         powerMeasurementSpecs.addAll(getProbeFrameworkListener()
-                .getMeasurementSpecificationsForMetricDescription(POWER_CONSUMPTION_TUPLE_METRIC_DESC));
+            .getMeasurementSpecificationsForMetricDescription(POWER_CONSUMPTION_TUPLE_METRIC_DESC));
         initPowerMeasurements(powerMeasurementSpecs);
     }
 
@@ -94,10 +95,11 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
     public void setProbeFrameworkListener(final AbstractProbeFrameworkListener probeFrameworkListener) {
         super.setProbeFrameworkListener(probeFrameworkListener);
         this.model = getProbeFrameworkListener().getSimuComModel();
-        this.rmModel = getProbeFrameworkListener().getPCMPartitionManager() 
-				.findModel(RuntimeMeasurementPackage.eINSTANCE.getRuntimeMeasurementModel());
-        this.globalPCMModelResourceSet = getProbeFrameworkListener().getPCMPartitionManager().getGlobalPCMModel()
-                .getResourceSet();
+        this.rmModel = getProbeFrameworkListener().getPCMPartitionManager()
+            .findModel(RuntimeMeasurementPackage.eINSTANCE.getRuntimeMeasurementModel());
+        this.globalPCMModelResourceSet = getProbeFrameworkListener().getPCMPartitionManager()
+            .getGlobalPCMModel()
+            .getResourceSet();
     }
 
     /**
@@ -110,15 +112,20 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
 
         if (!powerMeasurementSpecs.isEmpty()) {
             PowerModelRegistry powerModelRegistry = new PowerModelRegistry();
-            // Register simulation time provider. This is used to calculate transitions between power states.
+            // Register simulation time provider. This is used to calculate transitions between
+            // power states.
             ITimeProvider provider = new ITimeProvider() {
                 @Override
                 public Amount<Duration> getCurrentTime() {
-                    return Amount.valueOf(model.getSimulationControl().getCurrentSimulationTime(), SI.SECOND);
+                    return Amount.valueOf(model.getSimulationControl()
+                        .getCurrentSimulationTime(), SI.SECOND);
                 }
             };
+            IExtensionHelper extensionHelper = IExtensionHelper.INSTANCE;
+            ExtensibleCalculatorInstantiatorImpl calcInstantiator = new ExtensibleCalculatorInstantiatorImpl(provider,
+                    extensionHelper);
             PowerModelUpdaterSwitch modelUpdaterSwitch = new PowerModelUpdaterSwitch(powerModelRegistry,
-                    new ExtensibleCalculatorInstantiatorImpl(provider));
+                    calcInstantiator);
             Collection<ConsumptionContext> createdContexts = new ArrayList<>(powerMeasurementSpecs.size());
             Collection<SimulationTimeEvaluationScope> createdScopes = new ArrayList<>(powerMeasurementSpecs.size());
 
@@ -127,9 +134,9 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
                 MeasuringPoint measuringPoint = powerSpecMonitor.getMeasuringPoint();
 
                 Optional<TimeDriven> timeDrivenSpecification = PROCESSING_TYPE_SWITCH
-                        .doSwitch(powerSpec.getProcessingType());
+                    .doSwitch(powerSpec.getProcessingType());
                 PowerProvidingEntity powerProvidingEntity = InterpreterUtils
-                        .getPowerProvidingEntityFromMeasuringPoint(this.globalPCMModelResourceSet, measuringPoint);
+                    .getPowerProvidingEntityFromMeasuringPoint(this.globalPCMModelResourceSet, measuringPoint);
 
                 // this call crashes in case measurement specification or ppe are invalid
                 checkValidity(powerSpec, powerProvidingEntity, timeDrivenSpecification);
@@ -184,12 +191,15 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
         timeDrivenProcessingType.setWindowLength(fromProcessingType.getWindowLength());
 
         energySpec.setProcessingType(timeDrivenProcessingType);
-        energySpec.setTriggersSelfAdaptations(
-                fromProcessingType.getMeasurementSpecification().isTriggersSelfAdaptations());
+        energySpec.setTriggersSelfAdaptations(fromProcessingType.getMeasurementSpecification()
+            .isTriggersSelfAdaptations());
 
-        monitor.getMeasurementSpecifications().add(energySpec);
+        monitor.getMeasurementSpecifications()
+            .add(energySpec);
 
-        assert energySpec.getMonitor().getId().equals(monitor.getId());
+        assert energySpec.getMonitor()
+            .getId()
+            .equals(monitor.getId());
         return energySpec;
     }
 
@@ -220,17 +230,19 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
             final PowerProvidingEntity powerProvidingEntity, final Optional<TimeDriven> aggregation) {
 
         if (powerProvidingEntity == null) {
-            throw new IllegalStateException(
-                    "MeasurementSpecification '" + powerMeasurementSpec.getName() + "' for metric "
-                            + powerMeasurementSpec.getMetricDescription().getName() + " has to be related to a "
-                            + InfrastructurePackage.Literals.POWER_PROVIDING_ENTITY.getName() + "!");
+            throw new IllegalStateException("MeasurementSpecification '" + powerMeasurementSpec.getName()
+                    + "' for metric " + powerMeasurementSpec.getMetricDescription()
+                        .getName()
+                    + " has to be related to a " + InfrastructurePackage.Literals.POWER_PROVIDING_ENTITY.getName()
+                    + "!");
         }
 
         if (!aggregation.isPresent()) {
-            throw new IllegalStateException("MetricDescription ("
-                    + powerMeasurementSpec.getMetricDescription().getName() + ") '" + powerMeasurementSpec.getName()
-                    + "' of Monitor '" + powerMeasurementSpec.getMonitor().getEntityName() + "' must provide a "
-                    + MonitorRepositoryPackage.Literals.PROCESSING_TYPE.getName() + " of Type '"
+            throw new IllegalStateException("MetricDescription (" + powerMeasurementSpec.getMetricDescription()
+                .getName() + ") '" + powerMeasurementSpec.getName() + "' of Monitor '"
+                    + powerMeasurementSpec.getMonitor()
+                        .getEntityName()
+                    + "' must provide a " + MonitorRepositoryPackage.Literals.PROCESSING_TYPE.getName() + " of Type '"
                     + MonitorRepositoryPackage.Literals.TIME_DRIVEN.getName() + "'!");
         }
     }
@@ -250,9 +262,12 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
 
         if (measurementSpec.isTriggersSelfAdaptations()) {
             new MonitorRepositorySwitch<Void>() {
+                @Override
                 public Void caseFeedThrough(FeedThrough feedThrough) {
                     return null;
                 };
+
+                @Override
                 public Void caseTimeDrivenAggregation(TimeDrivenAggregation aggr) {
                     calculator.addObserver(new SlidingWindowRuntimeMeasurementsRecorder(rmModel, measurementSpec));
                     return null;
@@ -279,16 +294,17 @@ public class PowerProbeFrameworkListenerDecorator extends AbstractRecordingProbe
         assert scopesToCleanup != null && !scopesToCleanup.isEmpty();
         assert this.model != null;
 
-        this.model.getConfiguration().addListener(new ISimulationListener() {
-            @Override
-            public void simulationStop() {
-                contextsToCleanup.forEach(ConsumptionContext::cleanUp);
-                scopesToCleanup.forEach(SimulationTimeEvaluationScope::removeAllListeners);
-            }
+        this.model.getConfiguration()
+            .addListener(new ISimulationListener() {
+                @Override
+                public void simulationStop() {
+                    contextsToCleanup.forEach(ConsumptionContext::cleanUp);
+                    scopesToCleanup.forEach(SimulationTimeEvaluationScope::removeAllListeners);
+                }
 
-            @Override
-            public void simulationStart() {
-            }
-        });
+                @Override
+                public void simulationStart() {
+                }
+            });
     }
 }

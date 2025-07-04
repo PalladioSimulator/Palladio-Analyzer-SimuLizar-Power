@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.palladiosimulator.simulizar.power;singleton:=true
 Bundle-Version: 5.1.0.qualifier
 Bundle-Activator: org.palladiosimulator.simulizar.power.Activator
 Require-Bundle: de.uka.ipd.sdq.simucomframework,
- de.fzi.power.interpreter,
+ de.fzi.power.interpreter;bundle-version="5.1.0",
  org.palladiosimulator.probeframework,
  org.palladiosimulator.simulizar,
  org.palladiosimulator.edp2.util,
@@ -14,8 +14,9 @@ Require-Bundle: de.uka.ipd.sdq.simucomframework,
  org.palladiosimulator.simulizar.slidingwindow,
  de.uka.ipd.sdq.workflow.mdsd,
  org.palladiosimulator.simulizar.ui,
- org.palladiosimulator.analyzer.workflow,
- de.uka.ipd.sdq.simulation.abstractsimengine
+ org.palladiosimulator.analyzer.workflow.core;bundle-version="5.2.1",
+ de.uka.ipd.sdq.simulation.abstractsimengine,
+ org.palladiosimulator.recorderframework.core;bundle-version="5.2.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: palladiosimulator.org

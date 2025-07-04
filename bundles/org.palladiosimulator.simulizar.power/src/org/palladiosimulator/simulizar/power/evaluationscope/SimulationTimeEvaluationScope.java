@@ -34,15 +34,15 @@ import org.palladiosimulator.pcmmeasuringpoint.PcmmeasuringpointFactory;
 import org.palladiosimulator.pcmmeasuringpoint.PcmmeasuringpointPackage;
 import org.palladiosimulator.probeframework.calculator.Calculator;
 import org.palladiosimulator.probeframework.calculator.RegisterCalculatorFactoryDecorator;
-import org.palladiosimulator.recorderframework.AbstractRecorder;
-import org.palladiosimulator.recorderframework.config.IRecorderConfiguration;
+import org.palladiosimulator.recorderframework.core.AbstractRecorder;
+import org.palladiosimulator.recorderframework.core.config.IRecorderConfiguration;
 import org.palladiosimulator.simulizar.power.calculators.SimulationTimePowerCalculator;
 import org.palladiosimulator.simulizar.slidingwindow.impl.SimulizarSlidingWindow;
 
 import de.fzi.power.infrastructure.PowerProvidingEntity;
 import de.fzi.power.interpreter.AbstractEvaluationScope;
 import de.fzi.power.interpreter.InterpreterUtils;
-import de.uka.ipd.sdq.simucomframework.model.SimuComModel;
+import de.uka.ipd.sdq.simucomframework.core.model.SimuComModel;
 
 /**
  * This class is an implementation of an evaluation scope to gather utilization measurements
@@ -129,11 +129,11 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
                 Objects.requireNonNull(entityUnderMeasurement, "Given PowerProvidingEntity must not be null."));
         this.collector = new UtilizationMeasurementsCollector(this.processingResourceSpecs.size());
 
-        this.calculatorFactory = RegisterCalculatorFactoryDecorator.class
-                .cast(this.simModel.getProbeFrameworkContext().getCalculatorFactory());
+        this.calculatorFactory = RegisterCalculatorFactoryDecorator.class.cast(this.simModel.getProbeFrameworkContext()
+            .getCalculatorFactory());
 
         this.processingResourceSpecs
-                .forEach(spec -> this.resourceMeasurements.put(spec, Collections.singleton(new SingletonDataStream())));
+            .forEach(spec -> this.resourceMeasurements.put(spec, Collections.singleton(new SingletonDataStream())));
     }
 
     /**
@@ -173,7 +173,7 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
                 mp.setReplicaID(0);
 
                 resourceStateCalculator = Optional.ofNullable(this.calculatorFactory
-                        .getCalculatorByMeasuringPointAndMetricDescription(mp, RESOURCE_STATE_METRIC));
+                    .getCalculatorByMeasuringPointAndMetricDescription(mp, RESOURCE_STATE_METRIC));
                 resourceStateMetric = RESOURCE_STATE_METRIC;
             }
 
@@ -207,12 +207,12 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
      *         calculators
      */
     private Map<String, Calculator> getAvailableOverallUtilizationCalculators() {
-        return this.calculatorFactory.getRegisteredCalculators().stream()
-                .filter(calc -> calc.isCompatibleWith(UTILIZATION_METRIC)
-                        && ACTIVE_RESOURCE_MP_ECLASS.isInstance(calc.getMeasuringPoint()))
-                .collect(toMap(
-                        calc -> ((ActiveResourceMeasuringPoint) calc.getMeasuringPoint()).getActiveResource().getId(),
-                        Function.identity()));
+        return this.calculatorFactory.getRegisteredCalculators()
+            .stream()
+            .filter(calc -> calc.isCompatibleWith(UTILIZATION_METRIC)
+                    && ACTIVE_RESOURCE_MP_ECLASS.isInstance(calc.getMeasuringPoint()))
+            .collect(toMap(calc -> ((ActiveResourceMeasuringPoint) calc.getMeasuringPoint()).getActiveResource()
+                .getId(), Function.identity()));
     }
 
     private static Optional<Calculator> findOverallUtilizationCalculatorForProcessingResource(
@@ -263,7 +263,8 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
      * {@link #removeListener(ISimulationEvaluationScopeListener)} once per attached listener.
      */
     public void removeAllListeners() {
-        this.collector.getObservers().forEach(this::removeListener);
+        this.collector.getObservers()
+            .forEach(this::removeListener);
     }
 
     /**
@@ -300,7 +301,8 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
         @Override
         public Iterator<MeasuringValue> iterator() {
             throwExceptionIfClosed();
-            return this.innerElement.map(IteratorUtils::singletonListIterator).orElse(EMPTY_ITERATOR);
+            return this.innerElement.map(IteratorUtils::singletonListIterator)
+                .orElse(EMPTY_ITERATOR);
         }
 
         @Override
@@ -323,7 +325,8 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
         @Override
         public int size() {
             throwExceptionIfClosed();
-            return this.innerElement.map(el -> 1).orElse(0);
+            return this.innerElement.map(el -> 1)
+                .orElse(0);
         }
 
         /**
@@ -357,7 +360,7 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
 
         public UtilizationMeasurementsCollector(final int measurementsToCollect) {
             assert measurementsToCollect > 0;
-            this.collectedMeasurements = new HashMap<ProcessingResourceSpecification, MeasuringValue>(
+            this.collectedMeasurements = new HashMap<>(
                     measurementsToCollect);
             this.measurementsToCollect = measurementsToCollect;
         }
@@ -367,7 +370,8 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
             assert spec != null && utilMeasurement != null;
 
             if (this.collectedMeasurements.put(spec, utilMeasurement) == null
-                    || !SimulationTimeEvaluationScope.this.simModel.getSimulationControl().isRunning()) {
+                    || !SimulationTimeEvaluationScope.this.simModel.getSimulationControl()
+                        .isRunning()) {
                 if (this.collectedMeasurements.size() == this.measurementsToCollect) {
                     // one "round" is complete: windows of all specs have
                     // produced their utilization measurement
@@ -375,11 +379,12 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
                     // consumption contexts), then clear
                     for (ProcessingResourceSpecification proc : SimulationTimeEvaluationScope.this.processingResourceSpecs) {
                         Set<IDataStream<MeasuringValue>> dataset = SimulationTimeEvaluationScope.this.resourceMeasurements
-                                .get(proc);
+                            .get(proc);
                         assert dataset.size() == 1;
                         // this cast is safe as we insert only
                         // SingletonDataStream instances (cf. ctor)
-                        SingletonDataStream procMeasurements = (SingletonDataStream) dataset.iterator().next();
+                        SingletonDataStream procMeasurements = (SingletonDataStream) dataset.iterator()
+                            .next();
                         procMeasurements.exchangeElement(this.collectedMeasurements.get(proc));
                     }
                     resetScope();
@@ -397,7 +402,8 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
         }
 
         private void informScopeListeners() {
-            this.getEventDispatcher().newElementAvailable();
+            this.getEventDispatcher()
+                .newElementAvailable();
         }
     }
 
@@ -418,7 +424,7 @@ public class SimulationTimeEvaluationScope extends AbstractEvaluationScope {
         public void writeData(final MeasuringValue measurement) {
             // we receive a new utilization measurement now
             if (Objects.requireNonNull(measurement, "Somehow 'null' measurement was passed to recorder.")
-                    .isCompatibleWith(UTILIZATION_METRIC)) {
+                .isCompatibleWith(UTILIZATION_METRIC)) {
                 SimulationTimeEvaluationScope.this.collector.addUtilizationMeasurementForProcessingResource(spec,
                         measurement);
             }
