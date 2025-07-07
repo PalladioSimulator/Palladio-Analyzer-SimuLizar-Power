@@ -1,0 +1,5 @@
+commit 59291100f8f394f686307b9f7da284e3d36281b5
+Author: Sebastian Krach <krach@fzi.de>
+Date:   Tue Jan 26 11:05:20 2021 +0100
+
+    [SIMULIZAR-136] Extension API tuning + tests
