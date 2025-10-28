@@ -3,3 +3,9 @@ Author: Sebastian Krach <krach@fzi.de>
 Date:   Tue Jan 26 11:05:20 2021 +0100
 
     [SIMULIZAR-136] Extension API tuning + tests
+
+commit 088ef962a303b668c3cbedfa3e1ec0c59a91db46
+Author: Sebastian Krach <krach@fzi.de>
+Date:   Fri Jan 22 17:53:32 2021 +0100
+
+    Replaced local paths in target platform
