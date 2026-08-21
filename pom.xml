@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.palladiosimulator</groupId>
-		<artifactId>eclipse-parent-updatesite</artifactId>
-		<version>0.7.5</version>
+		<artifactId>repository-parent</artifactId>
+		<version>0.12.0</version>
 	</parent>
 	<groupId>org.palladiosimulator.simulizar.power</groupId>
 	<artifactId>parent</artifactId>	
